@@ -5,7 +5,9 @@
 
 char text[500]="\0";
 int nlCount=0;      //to count number of line breaks
-bool pairFlag=0;
+bool bldFlag=0;
+bool itlFlag=0;
+bool BI_Flag=0;
 char start[50]="\0";
 char end[50]="\0";
 
@@ -13,6 +15,7 @@ void incNL();       //to increase value of "nlCount"
 void write(char *str);  //to write in html file 
 void writeInt(int i);
 void writePair(char *str, char *start, char *end, char *);
+void writeBI_Pair(char *str);
 
 FILE *out;
 
@@ -27,6 +30,7 @@ int yyerror(char *str);
 %token H1 H2 H3 H4 H5 H6 
 %token TEXT
 %token WORD
+%token BLD_N_ITL
 %token BOLD
 %token ITALIC
 %token NUM 
@@ -43,6 +47,7 @@ int yyerror(char *str);
 %type <string> H6
 %type <string> TEXT
 %type <string> WORD
+%type <string> BLD_N_ITL
 %type <string> BOLD
 %type <string> ITALIC
 %type <number> NUM
@@ -70,20 +75,21 @@ next:
       | {write("<p>");} sentence {write("</p>");}
 ;
 
-linebreak:   NEWLINE {write("<br>\n"); incNL();}
-           | NATURAL_NEWLINE {write("\n");} NNL
-           | linebreak NEWLINE {write("<br>\n"); incNL();} 
+linebreak:   NEWLINE { write("<br>\n"); incNL();} natural_linebreak
+           | NATURAL_NEWLINE {write("\n");} natural_linebreak
+           | linebreak NEWLINE {write("<br>\n"); incNL();}
 ;
 
-NNL: %empty
-    | NATURAL_NEWLINE {write("\n");} NNL 
+natural_linebreak: %empty
+    | NATURAL_NEWLINE {write("\n");} natural_linebreak 
 ;
 
 sentence: %empty 
-      | WORD { if(pairFlag) strcat(text,$1); else write($1); } sentence  
-      | BOLD { pairFlag=!pairFlag; if(pairFlag) {strcpy(start,$1);} else {strcpy(end,$1); writePair(text,start,end,"strong"); strcpy(text,"\0");}} sentence
-      | ITALIC { pairFlag=!pairFlag; if(pairFlag) {strcpy(start,$1);} else {strcpy(end,$1); writePair(text,start,end,"em"); strcpy(text,"\0");}} sentence
-      | SPACE { if(pairFlag) {strcat(text," ");} else write(" ");} sentence 
+      | WORD { if(bldFlag || itlFlag || BI_Flag) strcat(text,$1); else write($1); } sentence  
+      | BLD_N_ITL { BI_Flag=!BI_Flag; if(BI_Flag) {strcpy(start,$1);} else {strcpy(end,$1); writeBI_Pair(text); strcpy(text,"\0");}} sentence
+      | BOLD { bldFlag=!bldFlag; if(bldFlag) {strcpy(start,$1);} else {strcpy(end,$1); writePair(text,start,end,"strong"); strcpy(text,"\0");}} sentence
+      | ITALIC { itlFlag=!itlFlag; if(itlFlag) {strcpy(start,$1);} else {strcpy(end,$1); writePair(text,start,end,"em"); strcpy(text,"\0");}} sentence
+      | SPACE { if(bldFlag || itlFlag || BI_Flag) {strcat(text," ");} else write(" ");} sentence 
 ;
 %%
 int yydebug=1;
@@ -109,6 +115,15 @@ void writeInt(int i)
 {
     //printf("%d",i);
     fprintf(out,"%d",i);
+}
+
+void writeBI_Pair(char *str)
+{
+
+        write("<strong><em>");
+        write(str);
+        write("</em></strong>");
+
 }
 
 void writePair(char *str, char* start, char *end, char *tag)
