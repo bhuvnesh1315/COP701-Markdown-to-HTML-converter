@@ -8,9 +8,18 @@ This is text of heading 3
 This is a paragraph<br>
 Second line of paragraph after br tag  
 Third line of paragraph after double space this was a paragraph.<br>
-** This is bold** normal text _italic . text_ this was a paragraph.<br>
+**This is bold** normal text _italic . text_ this was a paragraph.<br>
+** Not bold** <br>
+**Not bold ** <br>
+** Not bold ** <br>
+normal text<br> 
+_italic . text_<br>
+_ italic . text_<br>
+_italic . text _<br>
+_ italic . text _<br>
+ this was a paragraph.<br>
 **_Italic and bold_** _**another one**_<br>
-Third line of paragraph after double space<br>
+
 This is a link [Google](http://www.google.com)
 
 favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best search engine for privacy").

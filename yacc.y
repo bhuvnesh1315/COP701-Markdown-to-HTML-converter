@@ -3,11 +3,19 @@
 #include<string.h>
 #include<stdbool.h>
 
-char text[100]="\0";
+char text[500]="\0";
 int nlCount=0;      //to count number of line breaks
-bool bldFlag=0;
-bool itlFlag=0;
+bool pairFlag=0;
+char start[50]="\0";
+char end[50]="\0";
+
 void incNL();       //to increase value of "nlCount"
+void write(char *str);  //to write in html file 
+void writeInt(int i);
+void writePair(char *str, char *start, char *end, char *);
+
+FILE *out;
+
 int yylex();
 int yyerror(char *str);
 
@@ -52,26 +60,30 @@ program:  start
 ;
 
 start: %empty                             //blank spcae before"|" or %empty is epsilon"
-       | next linebreak { printf("\n lb=%d \n",nlCount); while(nlCount--); nlCount=0;} start { printf("\nafter start\n");} 
+       | next linebreak { /*write("lb="); writeInt(nlCount); nlCount=0;*/} start { printf("\nafter start\n");} 
        ;
 
 next: 
-        H1 sentence {printf("<h1>%s</h1>",text); strcpy(text,"\0");} linebreak { printf("\n lb=%d \n",nlCount); while(nlCount--); nlCount=0;} sentence {printf("%s",text); strcpy(text,"\0");}
-      | H2 sentence {printf("<h2>%s</h2>",text); strcpy(text,"\0");} linebreak { printf("\n lb=%d \n",nlCount); while(nlCount--); nlCount=0;} sentence {printf("%s",text); strcpy(text,"\0");}
-      | H3 sentence {printf("<h3>%s</h3>",text); strcpy(text,"\0");} linebreak { printf("\n lb=%d \n",nlCount); while(nlCount--); nlCount=0;} sentence {printf("%s",text); strcpy(text,"\0");}
-      | sentence {printf("<p>%s</p>",text); strcpy(text,"\0");}
+        H1 {write("<h1>");} sentence {write("</h1>");} linebreak { /*write("lb="); writeInt(nlCount); nlCount=0; */} sentence 
+      | H2 {write("<h2>");} sentence {write("</h2>");} linebreak { /*write("lb="); writeInt(nlCount); nlCount=0; */} sentence 
+      | H3 {write("<h3>");} sentence {write("</h3>");} linebreak { /*write("lb="); writeInt(nlCount); nlCount=0; */} sentence 
+      | {write("<p>");} sentence {write("</p>");}
 ;
 
-linebreak:   NEWLINE {incNL();}
-           | NATURAL_NEWLINE { printf("\n");} 
-           | linebreak NEWLINE {incNL();} 
+linebreak:   NEWLINE {write("<br>\n"); incNL();}
+           | NATURAL_NEWLINE {write("\n");} NNL
+           | linebreak NEWLINE {write("<br>\n"); incNL();} 
+;
+
+NNL: %empty
+    | NATURAL_NEWLINE {write("\n");} NNL 
 ;
 
 sentence: %empty 
-      | WORD { strcat(text,$1);} sentence  
-      | BOLD { bldFlag=!bldFlag; if(bldFlag) strcat(text,"<strong>"); else strcat(text,"</strong>");} sentence
-      | ITALIC { itlFlag=!itlFlag; if(itlFlag) strcat(text,"<em>"); else strcat(text,"</em>");} sentence
-      | SPACE { strcat(text," ");} sentence 
+      | WORD { if(pairFlag) strcat(text,$1); else write($1); } sentence  
+      | BOLD { pairFlag=!pairFlag; if(pairFlag) {strcpy(start,$1);} else {strcpy(end,$1); writePair(text,start,end,"strong"); strcpy(text,"\0");}} sentence
+      | ITALIC { pairFlag=!pairFlag; if(pairFlag) {strcpy(start,$1);} else {strcpy(end,$1); writePair(text,start,end,"em"); strcpy(text,"\0");}} sentence
+      | SPACE { if(pairFlag) {strcat(text," ");} else write(" ");} sentence 
 ;
 %%
 int yydebug=1;
@@ -87,8 +99,49 @@ void incNL()
     nlCount++;
 }
 
-int main()
+void write(char *str)
 {
+    //printf("%s",str);
+    fprintf(out,"%s",str);
+}
+
+void writeInt(int i)
+{
+    //printf("%d",i);
+    fprintf(out,"%d",i);
+}
+
+void writePair(char *str, char* start, char *end, char *tag)
+{
+    int len=strlen(str);
+
+    // printf("\n str =%s",str);
+    // printf("\n len =%d",len);
+    // printf("\n oth =%c",str[0]);
+    // printf("\n last =%c",str[len-2]);
+    
+    if(str[0]==' ' || str[len-1]==' ')
+    {
+        write(start);
+        write(str);
+        write(end);
+    }
+    else
+    {
+        write("<"); write(tag); write(">");
+        write(str);
+        write("</"); write(tag); write(">");
+    }
+}
+
+
+
+
+int main(int argc, char* argv[])
+{
+    out=fopen(argv[1],"w");
     yyparse();
+    fclose(out);
+
     return 0;
 }

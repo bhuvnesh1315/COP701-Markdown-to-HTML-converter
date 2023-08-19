@@ -18,7 +18,7 @@ h6     ([#][#][#][#][#][#])
 wrd    ({letter}|{digit}|[.])+
 txt    ({wrd}|{space})+
 numbers ([0-9])+
-nline  ("<br>\n"|({space}{space}"\n"))
+nline  ("<br>"|({space}{space}"\n"))
 %%
 
 {h1}			   {yylval.string = strdup(yytext); return (H1);}	
@@ -28,8 +28,8 @@ nline  ("<br>\n"|({space}{space}"\n"))
 {h5}			   {yylval.string = strdup(yytext); return (H5);}
 {h6}			   {yylval.string = strdup(yytext); return (H6);}
 {space}             {return(SPACE);}
-{wrd}              {yylval.string = strdup(yytext); return (WORD);}
 "**"              {yylval.string = strdup(yytext); return (BOLD);}
+{wrd}              {yylval.string = strdup(yytext); return (WORD);}
 "_"              {yylval.string = strdup(yytext); return (ITALIC);}
 {nline}      		   {return(NEWLINE);}
 "\n"                {return(NATURAL_NEWLINE);}
