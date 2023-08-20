@@ -16,10 +16,11 @@ h4          ([#][#][#][#])
 h5          ([#][#][#][#][#])
 h6          ([#][#][#][#][#][#])
 bold_N_itl  ("***"|"___")
-wrd         ({letter}|{digit}|[.])+
+special     ([~`!@#$%^&+=|\\:;"',>\.?\/-])
+wrd         ({letter}|{digit}|{special})+
 txt         ({wrd}|{space})+
-numbers     ([0-9])+
 nline       ("<br>"|({space}{space}"\n"))
+url         (http:\/\/www\.|https:\/\/www\.|https:\/\/|http:\/\/)?({letter}|{digit})+(\.({letter}|{digit})+)+(\.({letter}|{digit})+)+
 %%
 
 {h1}			    {yylval.string = strdup(yytext); return (H1);}	
@@ -34,6 +35,11 @@ nline       ("<br>"|({space}{space}"\n"))
 {bold_N_itl}        {yylval.string = strdup(yytext); return (BLD_N_ITL);}
 "**"|"__"           {yylval.string = strdup(yytext); return (BOLD);}
 "*"|"_"             {yylval.string = strdup(yytext); return (ITALIC);}
+"["                 {return (OPEN_SQR);}
+"]"                 {return (CLOSE_SQR);}
+"("                 {return (OPEN_CRV);}
+")"                 {return (CLOSE_CRV);}
+{url}               {yylval.string = strdup(yytext); return (LINK);}
 {wrd}               {yylval.string = strdup(yytext); return (WORD);}
 {nline}      	    {return(NEWLINE);}
 "\n"                {return(NATURAL_NEWLINE);}

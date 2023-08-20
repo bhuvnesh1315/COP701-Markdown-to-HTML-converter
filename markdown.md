@@ -14,29 +14,54 @@ Third line of paragraph after double space this was a paragraph.<br>
 ** Not bold ** <br>
 normal text<br> 
 _italic . text_<br>
-_ italic . text_<br>
-_italic . text _<br>
-_ italic . text _<br>
- this was a paragraph.<br>
-**_Italic and bold_** _**another one**_<br>
+_ not italic_<br>
+_not italic _<br>
+_ not italic _<br>
+this was a paragra ph.<br>
+__ALso Bold__<br>
+*Also Italic*<br>
 
-This is a link [Google](http://www.google.com)
+***Italic and Bold*** normal text ___another one___<br>
 
-favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best search engine for privacy").
 
-This is an image [alt text](https://images.unsplash.com/photo-1484807352052-23338990c6c6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80 "logo Title test 1")
- 
-This is list
+
+This is an unordered list
 
 * Item 1
 * Item 2
-* Item 3
+* Item 3<br>
 
++ Item 1
++ Item 2
++ Item 3
+
+- Item 1
+- Item 2
+- Item 3
 This is a numbered list
 
 1. Item 1
 1. Item 2
 1. Item 3
 
+1. Item 1
+2. Item 2
+3. Item 3
+
+5. Item 1
+3. Item 2
+0. Item 3
+
+This is a link [Google](https://www.google.com "This is link to google").
+
+favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best search engine for privacy").
+
+This is an image [alt text](https://images.unsplash.com/photo-1484807352052-23338990c6c6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80 "logo Title test 1")
+ 
+
+
+
 
 Here is a table
+
+Here is a code for extra credit

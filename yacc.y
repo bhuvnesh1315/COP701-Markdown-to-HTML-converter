@@ -17,6 +17,8 @@ void write(char *str);  //to write in html file
 void writeInt(int i);
 void writePair(char *str, char *start, char *end, char *);
 void writeBI_Pair(char *str);
+void writeLink(char *text, char *href, char *title);
+char *ltrim(char *str);
 
 FILE *out;
 
@@ -35,9 +37,13 @@ int yyerror(char *str);
 %token BLD_N_ITL
 %token BOLD
 %token ITALIC
-%token NUM 
 %token NEWLINE
 %token NATURAL_NEWLINE
+%token LINK
+%token OPEN_SQR
+%token CLOSE_SQR
+%token OPEN_CRV
+%token CLOSE_CRV
 %token SPACE
 %token WORD
 %token OTHER
@@ -55,19 +61,14 @@ int yyerror(char *str);
 %type <string> BOLD
 %type <string> ITALIC
 %type <string> WORD
-%type <number> NUM
 %type <string> SPACE
 %type <string> NATURAL_NEWLINE
+%type <string> LINK
+%type <string> OPEN_SQR
+%type <string> CLOSE_SQR
+%type <string> OPEN_CRV
+%type <string> CLOSE_CRV
 %type <string> NEWLINE
-
-%type <string> sentence
-%type <string> next
-%type <string> linebreak
-%type <string> start
-%type <string> natural_linebreak
-%type <string> unordered_list
-%type <string> ordered_list
-
 
 
 %union
@@ -86,7 +87,7 @@ start: %empty {}                            //blank spcae before"|" or %empty is
        ;
 
 next: 
-        H1 {write("<h1>");} sentence {printf("done==============%s", $3); write("</h1>");} linebreak  sentence linebreak
+        H1 {write("<h1>");} sentence {write("</h1>");} linebreak  sentence linebreak
       | H2 {write("<h2>");} sentence {write("</h2>");} linebreak  sentence linebreak
       | H3 {write("<h3>");} sentence {write("</h3>");} linebreak  sentence linebreak
       | {write("<p>");} sentence {write("</p>");} linebreak
@@ -103,12 +104,18 @@ natural_linebreak: %empty {}
     | NATURAL_NEWLINE {write("\n");} natural_linebreak 
 ;
 
-sentence: %empty {$$=calloc(1,1);}
+sentence: %empty
       | BLD_N_ITL { BI_Flag=!BI_Flag; if(BI_Flag) {strcpy(start,$1);} else {strcpy(end,$1); writeBI_Pair(text); strcpy(text,"\0");}} sentence
       | BOLD { bldFlag=!bldFlag; if(bldFlag) {strcpy(start,$1);} else {strcpy(end,$1); writePair(text,start,end,"strong"); strcpy(text,"\0");}} sentence
       | ITALIC { itlFlag=!itlFlag; if(itlFlag) {strcpy(start,$1);} else {strcpy(end,$1); writePair(text,start,end,"em"); strcpy(text,"\0");}} sentence
       | SPACE { if(bldFlag || itlFlag || BI_Flag) {strcat(text," ");} else write(" ");} sentence 
-      | WORD { if(bldFlag || itlFlag || BI_Flag) strcat(text,$1); else write($1); } sentence {$$=calloc(strlen($1)+strlen($3)+1,1); strcpy($$,$1); strcat($$,$3);}
+      | WORD { if(bldFlag || itlFlag || BI_Flag) strcat(text,$1); else write($1); } sentence /*{$$=calloc(strlen($1)+strlen($3)+1,1); strcpy($$,$1); strcat($$,$3);}*/
+      | OPEN_SQR words CLOSE_SQR OPEN_CRV LINK words CLOSE_CRV {writeLink($<string>2,$5,$<string>6);} sentence
+;
+
+words:        WORD words {$<string>$=calloc(strlen($<string>1)+strlen($<string>2),1); strcpy($<string>$,$<string>1); strcat($<string>$,$<string>2);}
+            | SPACE words {$<string>$=calloc(1+strlen($<string>2),1); strcpy($<string>$," "); strcat($<string>$,$<string>2);}
+            | %empty { $<string>$=calloc(0,0);}
 ;
 
 unordered_list:   UO_LIST {write("\n<li>");} sentence {write("</li>");} linebreak
@@ -180,6 +187,43 @@ void writePair(char *str, char* start, char *end, char *tag)
     }
 }
 
+char *ltrim(char *str)
+{
+            //to be written
+}
+
+void writeLink(char *text, char *href, char *title)
+{
+    int len=strlen(title);
+    char *new_title;
+    
+    printf("\n length = %d",len);
+    printf("\n title = %s\n",title);
+    
+    ltrim(title);   //to be done
+
+    if(len!=0)
+        new_title=(char *)calloc(len-3,1); 
+
+    write("<a href=\"");
+    write(href);
+    write("\" title=\"");
+    
+    if(len!=0)
+    {
+        if(title[len-1]=='\"')
+            strncpy(new_title, title+2,len-3);  
+        else    
+            strncpy(new_title, title+2,len-4);      //sometimes extra character adds at last of string, so removing it
+        
+        write(new_title);
+    }
+           //discarding space and qoutes before title
+    write("\">");
+    write(text);
+    write("</a>");
+
+}
 
 
 
