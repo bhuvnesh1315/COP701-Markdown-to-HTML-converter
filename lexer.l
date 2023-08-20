@@ -28,6 +28,8 @@ nline       ("<br>"|({space}{space}"\n"))
 {h4}			    {yylval.string = strdup(yytext); return (H4);}
 {h5}			    {yylval.string = strdup(yytext); return (H5);}
 {h6}			    {yylval.string = strdup(yytext); return (H6);}
+("* "|"- "|"+ ")    {yylval.string = strdup(yytext); return (UO_LIST);}
+{digit}"."{space}   {yylval.string = strdup(yytext); return (OR_LIST);}
 {space}             {return(SPACE);}
 {bold_N_itl}        {yylval.string = strdup(yytext); return (BLD_N_ITL);}
 "**"|"__"           {yylval.string = strdup(yytext); return (BOLD);}
@@ -37,7 +39,7 @@ nline       ("<br>"|({space}{space}"\n"))
 "\n"                {return(NATURAL_NEWLINE);}
 .      		        {throwError(); return(OTHER);}
 %%
-//above rules are according to priority
+//priority is accordin to longest pattern match
 
 void throwError()
 {

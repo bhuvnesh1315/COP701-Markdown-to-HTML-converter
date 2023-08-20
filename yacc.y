@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdbool.h>
+#include<stdlib.h>
 
 char text[500]="\0";
 int nlCount=0;      //to count number of line breaks
@@ -29,7 +30,8 @@ int yyerror(char *str);
 
 %token H1 H2 H3 H4 H5 H6 
 %token TEXT
-%token WORD
+%token UO_LIST
+%token OR_LIST
 %token BLD_N_ITL
 %token BOLD
 %token ITALIC
@@ -37,6 +39,7 @@ int yyerror(char *str);
 %token NEWLINE
 %token NATURAL_NEWLINE
 %token SPACE
+%token WORD
 %token OTHER
 
 %type <string> H1
@@ -46,12 +49,26 @@ int yyerror(char *str);
 %type <string> H5
 %type <string> H6
 %type <string> TEXT
-%type <string> WORD
+%type <string> UO_LIST
+%type <string> OR_LIST
 %type <string> BLD_N_ITL
 %type <string> BOLD
 %type <string> ITALIC
+%type <string> WORD
 %type <number> NUM
 %type <string> SPACE
+%type <string> NATURAL_NEWLINE
+%type <string> NEWLINE
+
+%type <string> sentence
+%type <string> next
+%type <string> linebreak
+%type <string> start
+%type <string> natural_linebreak
+%type <string> unordered_list
+%type <string> ordered_list
+
+
 
 %union
 {
@@ -64,15 +81,17 @@ int yyerror(char *str);
 program:  start
 ;
 
-start: %empty                             //blank spcae before"|" or %empty is epsilon"
-       | next linebreak { /*write("lb="); writeInt(nlCount); nlCount=0;*/} start { printf("\nafter start\n");} 
+start: %empty {}                            //blank spcae before"|" or %empty is epsilon"
+       | next start { printf("\nafter start\n");} 
        ;
 
 next: 
-        H1 {write("<h1>");} sentence {write("</h1>");} linebreak { /*write("lb="); writeInt(nlCount); nlCount=0; */} sentence 
-      | H2 {write("<h2>");} sentence {write("</h2>");} linebreak { /*write("lb="); writeInt(nlCount); nlCount=0; */} sentence 
-      | H3 {write("<h3>");} sentence {write("</h3>");} linebreak { /*write("lb="); writeInt(nlCount); nlCount=0; */} sentence 
-      | {write("<p>");} sentence {write("</p>");}
+        H1 {write("<h1>");} sentence {printf("done==============%s", $3); write("</h1>");} linebreak  sentence linebreak
+      | H2 {write("<h2>");} sentence {write("</h2>");} linebreak  sentence linebreak
+      | H3 {write("<h3>");} sentence {write("</h3>");} linebreak  sentence linebreak
+      | {write("<p>");} sentence {write("</p>");} linebreak
+      | {write("\n<ul>");} unordered_list {write("\n</ul>");}
+      | {write("\n<ol>");} ordered_list {write("\n</ol>");}
 ;
 
 linebreak:   NEWLINE { write("<br>\n"); incNL();} natural_linebreak
@@ -80,17 +99,28 @@ linebreak:   NEWLINE { write("<br>\n"); incNL();} natural_linebreak
            | linebreak NEWLINE {write("<br>\n"); incNL();}
 ;
 
-natural_linebreak: %empty
+natural_linebreak: %empty {}
     | NATURAL_NEWLINE {write("\n");} natural_linebreak 
 ;
 
-sentence: %empty 
-      | WORD { if(bldFlag || itlFlag || BI_Flag) strcat(text,$1); else write($1); } sentence  
+sentence: %empty {$$=calloc(1,1);}
       | BLD_N_ITL { BI_Flag=!BI_Flag; if(BI_Flag) {strcpy(start,$1);} else {strcpy(end,$1); writeBI_Pair(text); strcpy(text,"\0");}} sentence
       | BOLD { bldFlag=!bldFlag; if(bldFlag) {strcpy(start,$1);} else {strcpy(end,$1); writePair(text,start,end,"strong"); strcpy(text,"\0");}} sentence
       | ITALIC { itlFlag=!itlFlag; if(itlFlag) {strcpy(start,$1);} else {strcpy(end,$1); writePair(text,start,end,"em"); strcpy(text,"\0");}} sentence
       | SPACE { if(bldFlag || itlFlag || BI_Flag) {strcat(text," ");} else write(" ");} sentence 
+      | WORD { if(bldFlag || itlFlag || BI_Flag) strcat(text,$1); else write($1); } sentence {$$=calloc(strlen($1)+strlen($3)+1,1); strcpy($$,$1); strcat($$,$3);}
 ;
+
+unordered_list:   UO_LIST {write("\n<li>");} sentence {write("</li>");} linebreak
+                | unordered_list UO_LIST {write("\n<li>");} sentence {write("</li>");} linebreak
+;
+
+ordered_list:   OR_LIST {write("\n<li>");} sentence {write("</li>");} linebreak
+                | ordered_list OR_LIST {write("\n<li>");} sentence {write("</li>");} linebreak
+
+;
+
+
 %%
 int yydebug=1;
 
@@ -116,6 +146,7 @@ void writeInt(int i)
     //printf("%d",i);
     fprintf(out,"%d",i);
 }
+
 
 void writeBI_Pair(char *str)
 {
