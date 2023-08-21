@@ -24,7 +24,6 @@ __ALso Bold__<br>
 ***Italic and Bold*** normal text ___another one___<br>
 
 
-
 This is an unordered list
 
 * Item 1
@@ -52,11 +51,11 @@ This is a numbered list
 3. Item 2
 0. Item 3
 
-This is a link [Google](https://www.google.com "This is link to google").
+This is a link [Google]( https://www.maps.google.com).
 
 favorite search engine is [Duck Duck Go](https://duckduckgo.com "The best search engine for privacy").
 
-This is an image [alt text](https://images.unsplash.com/photo-1484807352052-23338990c6c6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80 "logo Title test 1")
+This is an image ![alt text]( https://images.unsplash.com/photo-1484807352052-23338990c6c6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80 "logo Title test 1")
  
 
 

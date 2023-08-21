@@ -3,6 +3,7 @@
 #include<string.h>
 #include<stdbool.h>
 #include<stdlib.h>
+#include<ctype.h>
 
 char text[500]="\0";
 int nlCount=0;      //to count number of line breaks
@@ -18,7 +19,7 @@ void writeInt(int i);
 void writePair(char *str, char *start, char *end, char *);
 void writeBI_Pair(char *str);
 void writeLink(char *text, char *href, char *title);
-char *ltrim(char *str);
+void writeImage(char *text, char *href, char *title);
 
 FILE *out;
 
@@ -44,6 +45,7 @@ int yyerror(char *str);
 %token CLOSE_SQR
 %token OPEN_CRV
 %token CLOSE_CRV
+%token EXCLAIM
 %token SPACE
 %token WORD
 %token OTHER
@@ -68,6 +70,7 @@ int yyerror(char *str);
 %type <string> CLOSE_SQR
 %type <string> OPEN_CRV
 %type <string> CLOSE_CRV
+%type <string> EXCLAIM
 %type <string> NEWLINE
 
 
@@ -110,12 +113,16 @@ sentence: %empty
       | ITALIC { itlFlag=!itlFlag; if(itlFlag) {strcpy(start,$1);} else {strcpy(end,$1); writePair(text,start,end,"em"); strcpy(text,"\0");}} sentence
       | SPACE { if(bldFlag || itlFlag || BI_Flag) {strcat(text," ");} else write(" ");} sentence 
       | WORD { if(bldFlag || itlFlag || BI_Flag) strcat(text,$1); else write($1); } sentence /*{$$=calloc(strlen($1)+strlen($3)+1,1); strcpy($$,$1); strcat($$,$3);}*/
-      | OPEN_SQR words CLOSE_SQR OPEN_CRV LINK words CLOSE_CRV {writeLink($<string>2,$5,$<string>6);} sentence
+      | OPEN_SQR words CLOSE_SQR OPEN_CRV spaces LINK words CLOSE_CRV {writeLink($<string>2,$6,$<string>7);} sentence
+      | EXCLAIM OPEN_SQR words CLOSE_SQR OPEN_CRV spaces LINK words CLOSE_CRV {writeImage($<string>3,$7,$<string>8);} sentence
 ;
 
+spaces: %empty
+        | SPACE
+;
 words:        WORD words {$<string>$=calloc(strlen($<string>1)+strlen($<string>2),1); strcpy($<string>$,$<string>1); strcat($<string>$,$<string>2);}
             | SPACE words {$<string>$=calloc(1+strlen($<string>2),1); strcpy($<string>$," "); strcat($<string>$,$<string>2);}
-            | %empty { $<string>$=calloc(0,0);}
+            | %empty { $<string>$=calloc(1,1);}
 ;
 
 unordered_list:   UO_LIST {write("\n<li>");} sentence {write("</li>");} linebreak
@@ -187,45 +194,46 @@ void writePair(char *str, char* start, char *end, char *tag)
     }
 }
 
-char *ltrim(char *str)
-{
-            //to be written
-}
-
 void writeLink(char *text, char *href, char *title)
 {
-    int len=strlen(title);
-    char *new_title;
-    
-    printf("\n length = %d",len);
-    printf("\n title = %s\n",title);
-    
-    ltrim(title);   //to be done
-
-    if(len!=0)
-        new_title=(char *)calloc(len-3,1); 
-
     write("<a href=\"");
     write(href);
-    write("\" title=\"");
+    write("\" title=");
     
-    if(len!=0)
+    if(strlen(title)>0)
     {
-        if(title[len-1]=='\"')
-            strncpy(new_title, title+2,len-3);  
-        else    
-            strncpy(new_title, title+2,len-4);      //sometimes extra character adds at last of string, so removing it
-        
-        write(new_title);
+        write(title);
     }
-           //discarding space and qoutes before title
-    write("\">");
+    else
+    {
+        write("\"\"");
+    }
+    write(">");
     write(text);
     write("</a>");
 
 }
 
+void writeImage(char *alt, char *src, char *title)
+{
+    write("<img src=\"");
+    write(src);
+    write("\" alt=\"");
+    write(alt);
+    write("\" title=");
+    
+    if(strlen(title)>0)
+    {
+        write(title);
+    }
+    else
+    {
+        write("\"\"");
+    }
 
+    write(">");
+
+}
 
 int main(int argc, char* argv[])
 {

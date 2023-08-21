@@ -16,11 +16,12 @@ h4          ([#][#][#][#])
 h5          ([#][#][#][#][#])
 h6          ([#][#][#][#][#][#])
 bold_N_itl  ("***"|"___")
-special     ([~`!@#$%^&+=|\\:;"',>\.?\/-])
+special     ([~`!@#$%^&+=|\\:;"s',>\.?-])
+url_sp_char ([%&_.+*'\(,?=-])
 wrd         ({letter}|{digit}|{special})+
 txt         ({wrd}|{space})+
 nline       ("<br>"|({space}{space}"\n"))
-url         (http:\/\/www\.|https:\/\/www\.|https:\/\/|http:\/\/)?({letter}|{digit})+(\.({letter}|{digit})+)+(\.({letter}|{digit})+)+
+url         (http:\/\/www\.|https:\/\/www\.|https:\/\/|http:\/\/|www\.)?({letter}|{digit}|{url_sp_char})+(\.({letter}|{digit}|{url_sp_char})+)+((\.|\/|{letter}|{digit}|{url_sp_char})+)+
 %%
 
 {h1}			    {yylval.string = strdup(yytext); return (H1);}	
@@ -39,6 +40,7 @@ url         (http:\/\/www\.|https:\/\/www\.|https:\/\/|http:\/\/)?({letter}|{dig
 "]"                 {return (CLOSE_SQR);}
 "("                 {return (OPEN_CRV);}
 ")"                 {return (CLOSE_CRV);}
+"!"                 {return (EXCLAIM);}
 {url}               {yylval.string = strdup(yytext); return (LINK);}
 {wrd}               {yylval.string = strdup(yytext); return (WORD);}
 {nline}      	    {return(NEWLINE);}
