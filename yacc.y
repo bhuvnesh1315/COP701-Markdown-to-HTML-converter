@@ -86,17 +86,20 @@ int yyerror(char *str);
 
 %%
 
-program:  start
+program:  {write("<!DOCTYPE html>\n<html>\n<head>\n<title>MD2HTML</title>\n<body>\n");} start {write("</body>\n</html>");}
 ;
 
-start: %empty {}                            //blank spcae before"|" or %empty is epsilon"
-       | next start { printf("\nafter start\n");} 
+start: %empty                             //blank spcae before"|" or %empty is epsilon"
+       | next start
        ;
 
 next: 
         H1 {write("<h1>");} sentence {write("</h1>");} linebreak  sentence linebreak
       | H2 {write("<h2>");} sentence {write("</h2>");} linebreak  sentence linebreak
       | H3 {write("<h3>");} sentence {write("</h3>");} linebreak  sentence linebreak
+      | H4 {write("<h4>");} sentence {write("</h4>");} linebreak  sentence linebreak
+      | H5 {write("<h5>");} sentence {write("</h5>");} linebreak  sentence linebreak
+      | H6 {write("<h6>");} sentence {write("</h6>");} linebreak  sentence linebreak
       | {write("<p>");} sentence {write("</p>");} linebreak
       | {write("\n<ul>");} unordered_list {write("\n</ul>");}
       | {write("\n<ol>");} ordered_list {write("\n</ol>");}
