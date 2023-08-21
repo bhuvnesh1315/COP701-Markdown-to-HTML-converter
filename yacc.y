@@ -13,13 +13,13 @@ bool BI_Flag=0;
 char start[50]="\0";
 char end[50]="\0";
 
-void incNL();       //to increase value of "nlCount"
+void incNL();           //to increase value of "nlCount"
 void write(char *str);  //to write in html file 
 void writeInt(int i);
 void writePair(char *str, char *start, char *end, char *);
 void writeBI_Pair(char *str);
 void writeLink(char *text, char *href, char *title);
-void writeImage(char *text, char *href, char *title);
+void writeImage(char *alt, char *src, char *title);
 
 FILE *out;
 
@@ -46,6 +46,8 @@ int yyerror(char *str);
 %token OPEN_CRV
 %token CLOSE_CRV
 %token EXCLAIM
+%token PIPE
+%token DASHES
 %token SPACE
 %token WORD
 %token OTHER
@@ -71,6 +73,8 @@ int yyerror(char *str);
 %type <string> OPEN_CRV
 %type <string> CLOSE_CRV
 %type <string> EXCLAIM
+%type <string> PIPE
+%type <string> DASHES
 %type <string> NEWLINE
 
 
@@ -96,6 +100,7 @@ next:
       | {write("<p>");} sentence {write("</p>");} linebreak
       | {write("\n<ul>");} unordered_list {write("\n</ul>");}
       | {write("\n<ol>");} ordered_list {write("\n</ol>");}
+      | {write("<table>\n");} table {write("</table>\n");}
 ;
 
 linebreak:   NEWLINE { write("<br>\n"); incNL();} natural_linebreak
@@ -117,9 +122,25 @@ sentence: %empty
       | EXCLAIM OPEN_SQR words CLOSE_SQR OPEN_CRV spaces LINK words CLOSE_CRV {writeImage($<string>3,$7,$<string>8);} sentence
 ;
 
+table:    {write("<tr>\n");} tab_head {write("</tr>\n");} linebreak separate  linebreak {write("<tr>\n");} tab_data {write("</tr>\n");}
+;
+
+tab_head:   PIPE
+          | PIPE {write("<th>");} words {write($<string>3); write("</th>\n");} tab_head
+;
+
+separate:   PIPE
+          | PIPE DASHES separate
+;
+tab_data: %empty 
+          | PIPE linebreak {write("</tr>\n"); write("<tr>\n");} tab_data
+          | PIPE {write("<td>");} words {write($<string>3); write("<td>\n");} tab_data
+;
+
 spaces: %empty
         | SPACE
 ;
+
 words:        WORD words {$<string>$=calloc(strlen($<string>1)+strlen($<string>2),1); strcpy($<string>$,$<string>1); strcat($<string>$,$<string>2);}
             | SPACE words {$<string>$=calloc(1+strlen($<string>2),1); strcpy($<string>$," "); strcat($<string>$,$<string>2);}
             | %empty { $<string>$=calloc(1,1);}

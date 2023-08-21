@@ -16,7 +16,7 @@ h4          ([#][#][#][#])
 h5          ([#][#][#][#][#])
 h6          ([#][#][#][#][#][#])
 bold_N_itl  ("***"|"___")
-special     ([~`!@#$%^&+=|\\:;"s',>\.?-])
+special     ([~`!@#$%^&+=|\\:;"s',>\.?])
 url_sp_char ([%&_.+*'\(,?=-])
 wrd         ({letter}|{digit}|{special})+
 txt         ({wrd}|{space})+
@@ -41,6 +41,8 @@ url         (http:\/\/www\.|https:\/\/www\.|https:\/\/|http:\/\/|www\.)?({letter
 "("                 {return (OPEN_CRV);}
 ")"                 {return (CLOSE_CRV);}
 "!"                 {return (EXCLAIM);}
+"|"                 {return (PIPE);}
+("-")+              {yylval.string = strdup(yytext); return (DASHES);}
 {url}               {yylval.string = strdup(yytext); return (LINK);}
 {wrd}               {yylval.string = strdup(yytext); return (WORD);}
 {nline}      	    {return(NEWLINE);}
