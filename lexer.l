@@ -22,6 +22,7 @@ wrd         ({letter}|{digit}|{special})+
 txt         ({wrd}|{space})+
 nline       ("<br>"|({space}{space}"\n"))
 url         (http:\/\/www\.|https:\/\/www\.|https:\/\/|http:\/\/|www\.)?({letter}|{digit}|{url_sp_char})+(\.({letter}|{digit}|{url_sp_char})+)+((\.|\/|{letter}|{digit}|{url_sp_char})+)+
+tab         ["\t"]
 %%
 
 {h1}			    {yylval.string = strdup(yytext); return (H1);}	
@@ -33,6 +34,8 @@ url         (http:\/\/www\.|https:\/\/www\.|https:\/\/|http:\/\/|www\.)?({letter
 ("* "|"- "|"+ ")    {yylval.string = strdup(yytext); return (UO_LIST);}
 {digit}"."{space}   {yylval.string = strdup(yytext); return (OR_LIST);}
 {space}             {return(SPACE);}
+{tab}               {return(TAB);}
+"```"               {return(CODE);}
 {bold_N_itl}        {yylval.string = strdup(yytext); return (BLD_N_ITL);}
 "**"|"__"           {yylval.string = strdup(yytext); return (BOLD);}
 "*"|"_"             {yylval.string = strdup(yytext); return (ITALIC);}
@@ -43,6 +46,9 @@ url         (http:\/\/www\.|https:\/\/www\.|https:\/\/|http:\/\/|www\.)?({letter
 "!"                 {return (EXCLAIM);}
 "|"                 {return (PIPE);}
 ("-")+              {yylval.string = strdup(yytext); return (DASHES);}
+"/"                 {return (FORWARD_SLASH);}
+"<"                 {return (OPEN_ANG);}
+">"                 {return (CLOSE_ANG);}
 {url}               {yylval.string = strdup(yytext); return (LINK);}
 {wrd}               {yylval.string = strdup(yytext); return (WORD);}
 {nline}      	    {return(NEWLINE);}

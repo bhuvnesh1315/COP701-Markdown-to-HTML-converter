@@ -48,7 +48,12 @@ int yyerror(char *str);
 %token EXCLAIM
 %token PIPE
 %token DASHES
+%token FORWARD_SLASH
+%token OPEN_ANG
+%token CLOSE_ANG
+%token CODE
 %token SPACE
+%token TAB
 %token WORD
 %token OTHER
 
@@ -66,6 +71,7 @@ int yyerror(char *str);
 %type <string> ITALIC
 %type <string> WORD
 %type <string> SPACE
+%type <string> TAB
 %type <string> NATURAL_NEWLINE
 %type <string> LINK
 %type <string> OPEN_SQR
@@ -74,6 +80,10 @@ int yyerror(char *str);
 %type <string> CLOSE_CRV
 %type <string> EXCLAIM
 %type <string> PIPE
+%type <string> FORWARD_SLASH
+%type <string> OPEN_ANG
+%type <string> CLOSE_ANG
+%type <string> CODE
 %type <string> DASHES
 %type <string> NEWLINE
 
@@ -104,6 +114,24 @@ next:
       | {write("\n<ul>");} unordered_list {write("\n</ul>");}
       | {write("\n<ol>");} ordered_list {write("\n</ol>");}
       | {write("<table>\n");} table {write("</table>\n");}
+      | CODE {write("<pre><code>\n");} code_text {write("\n</code></pre>\n");} CODE
+;
+
+code_text:    %empty
+            | natural_linebreak code_text
+            | words {write($<string>1);} code_text
+            | LINK {write($1);} code_text
+            | SPACE {write(" ");} code_text
+            | TAB {write("\t");} code_text
+            | DASHES {write("-");} code_text
+            | OPEN_SQR {write("[");} code_text
+            | CLOSE_SQR {write("]");} code_text
+            | OPEN_CRV {write("(");} code_text
+            | CLOSE_CRV {write(")");} code_text
+            | FORWARD_SLASH {write("/");} code_text
+            | OPEN_ANG {write("<");} code_text
+            | CLOSE_ANG {write(">");} code_text
+            | EXCLAIM {write("!");} code_text
 ;
 
 linebreak:   NEWLINE { write("<br>\n"); incNL();} natural_linebreak
@@ -120,7 +148,7 @@ sentence: %empty
       | BOLD { bldFlag=!bldFlag; if(bldFlag) {strcpy(start,$1);} else {strcpy(end,$1); writePair(text,start,end,"strong"); strcpy(text,"\0");}} sentence
       | ITALIC { itlFlag=!itlFlag; if(itlFlag) {strcpy(start,$1);} else {strcpy(end,$1); writePair(text,start,end,"em"); strcpy(text,"\0");}} sentence
       | SPACE { if(bldFlag || itlFlag || BI_Flag) {strcat(text," ");} else write(" ");} sentence 
-      | WORD { if(bldFlag || itlFlag || BI_Flag) strcat(text,$1); else write($1); } sentence /*{$$=calloc(strlen($1)+strlen($3)+1,1); strcpy($$,$1); strcat($$,$3);}*/
+      | WORD { if(bldFlag || itlFlag || BI_Flag) strcat(text,$1); else write($1); } sentence
       | OPEN_SQR words CLOSE_SQR OPEN_CRV spaces LINK words CLOSE_CRV {writeLink($<string>2,$6,$<string>7);} sentence
       | EXCLAIM OPEN_SQR words CLOSE_SQR OPEN_CRV spaces LINK words CLOSE_CRV {writeImage($<string>3,$7,$<string>8);} sentence
 ;

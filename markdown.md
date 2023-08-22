@@ -2,13 +2,23 @@
 This is text of heading 1
 ## This is  h2
 This is text of heading 2
+
 ### this is h3
 This is text of heading 3
+
+#### this is h4
+This is text of heading 4
+
+##### this is h5
+This is text of heading 5
+
+###### this is h6
+This is text of heading 6
 
 This is a paragraph<br>
 Second line of paragraph after br tag  
 Third line of paragraph after double space this was a paragraph.<br>
-**This is bold** normal text _italic . text_ this was a paragraph.<br>
+Hello **This is bold** normal text _italic . text_ this was a paragraph.<br>
 ** Not bold** <br>
 **Not bold ** <br>
 ** Not bold ** <br>
@@ -63,4 +73,37 @@ This is an image ![alt text]( https://images.unsplash.com/photo-1484807352052-23
 
 Here is a table
 
-Here is a code for extra credit
+| 0 | 0 | 0  | 0  | 0   | 0   |
+|---|---|----|----|-----|-----|
+| 0 | 1 | 2  | 3  | 4   | 5   |
+| 0 | 2 | 5  | 9  | 14  | 20  |
+| 0 | 3 | 9  | 19 | 34  | 55  |
+| 0 | 4 | 14 | 34 | 69  | 125 |
+| 0 | 5 | 20 | 55 | 125 | 251 |
+
+Here is a code of makefile:
+```
+output: lex.yy.c yacc.tab.c
+	gcc -o output lex.yy.c yacc.tab.c
+
+lex.yy.c: lexer.l
+	flex lexer.l
+
+yacc.tab.c: yacc.y
+	bison -d yacc.y
+
+clean:
+	rm lex.yy.c yacc.tab.c output yacc.tab.h
+```
+
+Code of shell file:
+
+```
+make
+./output  < $1 $2
+exist=`which firefox`
+if [ ! -z "$exist" ]
+then firefox $2
+fi
+make clean
+```
