@@ -151,6 +151,11 @@ sentence: %empty
       | WORD { if(bldFlag || itlFlag || BI_Flag) strcat(text,$1); else write($1); } sentence
       | OPEN_SQR words CLOSE_SQR OPEN_CRV spaces LINK words CLOSE_CRV {writeLink($<string>2,$6,$<string>7);} sentence
       | EXCLAIM OPEN_SQR words CLOSE_SQR OPEN_CRV spaces LINK words CLOSE_CRV {writeImage($<string>3,$7,$<string>8);} sentence
+      | OPEN_CRV {write("(");} sentence
+      | CLOSE_CRV {write(")");} sentence
+      | FORWARD_SLASH {write("/");} sentence
+      | OPEN_ANG {write("<");} sentence
+      | CLOSE_ANG {write(">");} sentence
 ;
 
 table:    {write("<tr>\n");} tab_head {write("</tr>\n");} linebreak separate  linebreak {write("<tr>\n");} tab_data {write("</tr>\n");}
