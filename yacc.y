@@ -104,12 +104,12 @@ start: %empty                             //blank spcae before"|" or %empty is e
        ;
 
 next: 
-        H1 {write("<h1>");} sentence {write("</h1>");} linebreak  sentence linebreak
-      | H2 {write("<h2>");} sentence {write("</h2>");} linebreak  sentence linebreak
-      | H3 {write("<h3>");} sentence {write("</h3>");} linebreak  sentence linebreak
-      | H4 {write("<h4>");} sentence {write("</h4>");} linebreak  sentence linebreak
-      | H5 {write("<h5>");} sentence {write("</h5>");} linebreak  sentence linebreak
-      | H6 {write("<h6>");} sentence {write("</h6>");} linebreak  sentence linebreak
+        H1 {write("<h1>");} sentence {write("</h1>");} linebreak
+      | H2 {write("<h2>");} sentence {write("</h2>");} linebreak
+      | H3 {write("<h3>");} sentence {write("</h3>");} linebreak
+      | H4 {write("<h4>");} sentence {write("</h4>");} linebreak
+      | H5 {write("<h5>");} sentence {write("</h5>");} linebreak
+      | H6 {write("<h6>");} sentence {write("</h6>");} linebreak
       | {write("<p>");} sentence {write("</p>");} linebreak
       | {write("\n<ul>");} unordered_list {write("\n</ul>");}
       | {write("\n<ol>");} ordered_list {write("\n</ol>");}
@@ -147,8 +147,7 @@ sentence: %empty
       | BLD_N_ITL { BI_Flag=!BI_Flag; if(BI_Flag) {strcpy(start,$1);} else {strcpy(end,$1); writeBI_Pair(text); strcpy(text,"\0");}} sentence
       | BOLD { bldFlag=!bldFlag; if(bldFlag) {strcpy(start,$1);} else {strcpy(end,$1); writePair(text,start,end,"strong"); strcpy(text,"\0");}} sentence
       | ITALIC { itlFlag=!itlFlag; if(itlFlag) {strcpy(start,$1);} else {strcpy(end,$1); writePair(text,start,end,"em"); strcpy(text,"\0");}} sentence
-      | SPACE { if(bldFlag || itlFlag || BI_Flag) {strcat(text," ");} else write(" ");} sentence 
-      | WORD { if(bldFlag || itlFlag || BI_Flag) strcat(text,$1); else write($1); } sentence
+      | words { if(bldFlag || itlFlag || BI_Flag) {strcat(text,$<string>1);} else write($<string>1);} sentence 
       | OPEN_SQR words CLOSE_SQR OPEN_CRV spaces LINK words CLOSE_CRV {writeLink($<string>2,$6,$<string>7);} sentence
       | EXCLAIM OPEN_SQR words CLOSE_SQR OPEN_CRV spaces LINK words CLOSE_CRV {writeImage($<string>3,$7,$<string>8);} sentence
       | OPEN_CRV {write("(");} sentence
@@ -166,7 +165,7 @@ tab_head:   PIPE
 ;
 
 separate:   PIPE
-          | PIPE DASHES separate
+          | PIPE spaces DASHES spaces separate
 ;
 tab_data: %empty 
           | PIPE linebreak {write("</tr>\n"); write("<tr>\n");} tab_data
@@ -177,7 +176,8 @@ spaces: %empty
         | SPACE
 ;
 
-words:        WORD words {$<string>$=calloc(strlen($<string>1)+strlen($<string>2),1); strcpy($<string>$,$<string>1); strcat($<string>$,$<string>2);}
+words:        LINK words {$<string>$=calloc(strlen($<string>1)+strlen($<string>2),1); strcpy($<string>$,$<string>1); strcat($<string>$,$<string>2);}
+            | WORD words {$<string>$=calloc(strlen($<string>1)+strlen($<string>2),1); strcpy($<string>$,$<string>1); strcat($<string>$,$<string>2);}
             | SPACE words {$<string>$=calloc(1+strlen($<string>2),1); strcpy($<string>$," "); strcat($<string>$,$<string>2);}
             | %empty { $<string>$=calloc(1,1);}
 ;

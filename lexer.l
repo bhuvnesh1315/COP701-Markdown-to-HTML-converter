@@ -16,8 +16,8 @@ h4          ([#][#][#][#])
 h5          ([#][#][#][#][#])
 h6          ([#][#][#][#][#][#])
 bold_N_itl  ("***"|"___")
-special     ([~`!@#$%^&+=|\\:;"s',>\.?])
-url_sp_char ([%&_.+*'\(,?=-])
+special     ([~`!@#$%^&+=|\\:;"s',.?])
+url_sp_char ([%&_.+*',?=-])
 wrd         ({letter}|{digit}|{special})+
 txt         ({wrd}|{space})+
 nline       ("<br>"|({space}{space}"\n"))
