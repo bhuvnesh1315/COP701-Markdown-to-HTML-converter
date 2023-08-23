@@ -3,7 +3,7 @@
 #include<string.h>
 #include"yacc.tab.h"
 
-void throwError();		
+void throwError();		            //To print the errors if encountered
 %}
 
 letter      [a-zA-Z]
@@ -19,7 +19,6 @@ bold_N_itl  ("***"|"___")
 special     ([~`!@#$%^&+=|\\:;"s',.?])
 url_sp_char ([%&_.+*',?=-])
 wrd         ({letter}|{digit}|{special})+
-txt         ({wrd}|{space})+
 nline       ("<br>"|({space}{space}"\n"))
 url         (http:\/\/www\.|https:\/\/www\.|https:\/\/|http:\/\/|www\.)?({letter}|{digit}|{url_sp_char})+(\.({letter}|{digit}|{url_sp_char})+)+((\.|\/|{letter}|{digit}|{url_sp_char})+)+
 tab         ["\t"]
@@ -63,5 +62,5 @@ void throwError()
 }
 int yywrap()
 {
-    return 1;
+    return 1;               //return 1 when End of File encountered and stop generating tokens
 }

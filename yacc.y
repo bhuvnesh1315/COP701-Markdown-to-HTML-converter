@@ -5,57 +5,54 @@
 #include<stdlib.h>
 #include<ctype.h>
 
-char text[500]="\0";
-int nlCount=0;      //to count number of line breaks
-bool bldFlag=0;
-bool itlFlag=0;
-bool BI_Flag=0;
-char start[50]="\0";
-char end[50]="\0";
+char text[500]="\0";                    //to store string temporarily
+bool bldFlag=0;                         //to match start and end of BOLD
+bool itlFlag=0;                         //to match start and end of Italics
+bool BI_Flag=0;                         //to match start and end of Bold_and_Italics
+char start[50]="\0";                    //to get start of Bold and Italics
+char end[50]="\0";                      //to get end of Bold and Italics
 
-void incNL();           //to increase value of "nlCount"
-void write(char *str);  //to write in html file 
-void writeInt(int i);
-void writePair(char *str, char *start, char *end, char *);
-void writeBI_Pair(char *str);
-void writeLink(char *text, char *href, char *title);
-void writeImage(char *alt, char *src, char *title);
+void write(char *str);                                          //to write in html file 
+void writePair(char *str, char *start, char *end, char *);      //to write Bold/italic text in html file
+void writeBI_Pair(char *str);                                   //to write Bold_and_italic text in html file
+void writeLink(char *text, char *href, char *title);            //to write Link in html file
+void writeImage(char *alt, char *src, char *title);             //to write Image in html file
 
-FILE *out;
+FILE *out;                                                      //out variable to write in file
 
-int yylex();
-int yyerror(char *str);
+int yylex();                                                    //declaration so that tokens from lexical analyser can be used here
+int yyerror(char *str);                                         //print errors encountered(if any)
 
 
 %}
+//Declaring the token to be used
 
-//below tokens are according to priority
-
-%token H1 H2 H3 H4 H5 H6 
-%token TEXT
-%token UO_LIST
-%token OR_LIST
-%token BLD_N_ITL
+%token H1 H2 H3 H4 H5 H6                    //Headings 1-6
+%token UO_LIST                              //Unordered list
+%token OR_LIST                              //Ordered list
+%token BLD_N_ITL                            //Bold_and_Italic
 %token BOLD
 %token ITALIC
-%token NEWLINE
-%token NATURAL_NEWLINE
+%token NEWLINE                              //for <br> tag and double space in markdown
+%token NATURAL_NEWLINE                      //for \n
 %token LINK
-%token OPEN_SQR
-%token CLOSE_SQR
-%token OPEN_CRV
-%token CLOSE_CRV
-%token EXCLAIM
-%token PIPE
+%token OPEN_SQR                             //Open square bracket
+%token CLOSE_SQR                            //Close square bracket
+%token OPEN_CRV                             //Open Curve bracket
+%token CLOSE_CRV                            //Close Curve bracket
+%token EXCLAIM                              //Exclamation symbol
+%token PIPE                                 //Pipe symbol
 %token DASHES
 %token FORWARD_SLASH
-%token OPEN_ANG
-%token CLOSE_ANG
-%token CODE
+%token OPEN_ANG                             //Open Angular bracket
+%token CLOSE_ANG                            //Close angular bracket
+%token CODE                                 //For Programming Code snippet in markdown
 %token SPACE
-%token TAB
-%token WORD
-%token OTHER
+%token TAB                                  //for \t
+%token WORD                                 //for english word madeup of letters, numbers and some special characters
+%token OTHER                                //for any other input which is not recognised by lexer
+
+//Declaring the type of each token
 
 %type <string> H1
 %type <string> H2
@@ -63,7 +60,6 @@ int yyerror(char *str);
 %type <string> H4
 %type <string> H5
 %type <string> H6
-%type <string> TEXT
 %type <string> UO_LIST
 %type <string> OR_LIST
 %type <string> BLD_N_ITL
@@ -88,20 +84,22 @@ int yyerror(char *str);
 %type <string> NEWLINE
 
 
+//token from lexer will be shared to bison via union
+
 %union
 {
     char *string;
-    int number;
 }
 
 %%
-
+//Start symbol of Grammer is "program"
 program:  {write("<!DOCTYPE html>\n<html>\n<head>\n<title>MD2HTML</title>\n<body>\n");} start {write("</body>\n</html>");}
 ;
 
-start: %empty                             //blank spcae before"|" or %empty is epsilon"
+start: %empty                             //blank space before"|" or %empty is epsilon"
        | next start
        ;
+
 
 next: 
         H1 {write("<h1>");} sentence {write("</h1>");} linebreak
@@ -134,9 +132,9 @@ code_text:    %empty
             | EXCLAIM {write("!");} code_text
 ;
 
-linebreak:   NEWLINE { write("<br>\n"); incNL();} natural_linebreak
+linebreak:   NEWLINE { write("<br>\n");} natural_linebreak
            | NATURAL_NEWLINE {write("\n");} natural_linebreak
-           | linebreak NEWLINE {write("<br>\n"); incNL();}
+           | linebreak NEWLINE {write("<br>\n");}
 ;
 
 natural_linebreak: %empty {}
@@ -193,7 +191,7 @@ ordered_list:   OR_LIST {write("\n<li>");} sentence {write("</li>");} linebreak
 
 
 %%
-int yydebug=1;
+int yydebug=1;                              //to enable debugging set to 1
 
 int yyerror(char *str)
 {
@@ -201,23 +199,10 @@ int yyerror(char *str)
 	return 0;
 }
 
-void incNL()
-{
-    nlCount++;
-}
-
 void write(char *str)
 {
-    //printf("%s",str);
     fprintf(out,"%s",str);
 }
-
-void writeInt(int i)
-{
-    //printf("%d",i);
-    fprintf(out,"%d",i);
-}
-
 
 void writeBI_Pair(char *str)
 {
@@ -232,12 +217,7 @@ void writePair(char *str, char* start, char *end, char *tag)
 {
     int len=strlen(str);
 
-    // printf("\n str =%s",str);
-    // printf("\n len =%d",len);
-    // printf("\n oth =%c",str[0]);
-    // printf("\n last =%c",str[len-2]);
-    
-    if(str[0]==' ' || str[len-1]==' ')
+    if(str[0]==' ' || str[len-1]==' ')                          //handling the spaces before/after of bold and italic notaions
     {
         write(start);
         write(str);
@@ -295,7 +275,7 @@ void writeImage(char *alt, char *src, char *title)
 int main(int argc, char* argv[])
 {
     out=fopen(argv[1],"w");
-    yyparse();
+    yyparse();                                  //yyparse() parse the tokens received from yylex()
     fclose(out);
 
     return 0;
