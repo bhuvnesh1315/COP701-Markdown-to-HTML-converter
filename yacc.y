@@ -174,9 +174,9 @@ spaces: %empty
         | SPACE
 ;
 
-words:        LINK words {$<string>$=calloc(strlen($<string>1)+strlen($<string>2),1); strcpy($<string>$,$<string>1); strcat($<string>$,$<string>2);}
-            | WORD words {$<string>$=calloc(strlen($<string>1)+strlen($<string>2),1); strcpy($<string>$,$<string>1); strcat($<string>$,$<string>2);}
-            | SPACE words {$<string>$=calloc(1+strlen($<string>2),1); strcpy($<string>$," "); strcat($<string>$,$<string>2);}
+words:        LINK words {$<string>$=calloc(strlen($<string>1)+strlen($<string>2)+1,1); strcpy($<string>$,$<string>1); strcat($<string>$,$<string>2);}
+            | WORD words {$<string>$=calloc(strlen($<string>1)+strlen($<string>2)+1,1); strcpy($<string>$,$<string>1); strcat($<string>$,$<string>2);}
+            | SPACE words {$<string>$=calloc(1+strlen($<string>2)+1,1); strcpy($<string>$," "); strcat($<string>$,$<string>2);}
             | %empty { $<string>$=calloc(1,1);}
 ;
 
