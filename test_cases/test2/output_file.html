@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MD2HTML</title>
+<body>
+<h1>  This is  h1</h1>
+<p>This is text of heading 1</p>
+<h2> This is  h2</h2>
+<p>This is text of heading 2</p>
+
+<h3> this is h3</h3>
+<p>This is text of heading 3</p>
+
+<h4> this is h4</h4>
+<p>This is text of heading 4</p>
+
+<h5> this is h5</h5>
+<p>This is text of heading 5</p>
+
+<h6> this is h6</h6>
+<p>This is text of heading 6</p>
+
+<p>This is a paragraph</p><br>
+
+<p>Second line of paragraph after br tag</p><br>
+<p>Third line of paragraph after double space this was a paragraph.</p><br>
+
+<p>Hello <strong>This is bold</strong> normal text <em>italic . text</em> this was a paragraph.</p><br>
+
+<p>** Not bold** </p><br>
+
+<p>**Not bold ** </p><br>
+
+<p>** Not bold ** </p><br>
+
+<p>normal text</p><br>
+<p> </p>
+<p><em>italic . text</em></p><br>
+
+<p>_ not italic_</p><br>
+
+<p>_not italic _</p><br>
+
+<p>_ not italic _</p><br>
+
+<p>this was a paragra ph.</p><br>
+
+<p><strong>ALso Bold</strong></p><br>
+
+<p><em>Also Italic</em></p><br>
+
+
+<p><strong><em>Italic and Bold</em></strong> normal text <strong><em>another one</em></strong></p><br>
+
+
+
+<p>This is an unordered list</p>
+
+
+<ul>
+<li>Item 1</li>
+
+<li>Item 2</li>
+
+<li>Item 3</li><br>
+
+
+
+<li>Item 1</li>
+
+<li>Item 2</li>
+
+<li>Item 3</li>
+
+
+<li>Item 1</li>
+
+<li>Item 2</li>
+
+<li>Item 3</li>
+
+</ul><p>This is a numbered list</p>
+
+
+<ol>
+<li>Item 1</li>
+
+<li>Item 2</li>
+
+<li>Item 3</li>
+
+
+<li>Item 1</li>
+
+<li>Item 2</li>
+
+<li>Item 3</li>
+
+
+<li>Item 1</li>
+
+<li>Item 2</li>
+
+<li>Item 3</li>
+
+
+</ol><p>This is a link <a href="https://www.maps.google.com" title="">Google</a>.</p>
+
+<p>favorite search engine is <a href="https://duckduckgo.com" title= "The best search engine for privacy">Duck Duck Go</a>.</p>
+
+<p>This is an image <img src="https://images.unsplash.com/photo-1484807352052-23338990c6c6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="alt text" title= "logo Title test 1"></p>
+<p> </p>
+
+
+
+
+<p>Here is a table</p>
+
+<table>
+<tr>
+<th> 0 </th>
+<th> 0 </th>
+<th> 0  </th>
+<th> 0  </th>
+<th> 0   </th>
+<th> 0   </th>
+</tr>
+
+
+<tr>
+<td> 0 <td>
+<td> 1 <td>
+<td> 2  <td>
+<td> 3  <td>
+<td> 4   <td>
+<td> 5   <td>
+
+</tr>
+<tr>
+<td> 0 <td>
+<td> 2 <td>
+<td> 5  <td>
+<td> 9  <td>
+<td> 14  <td>
+<td> 20  <td>
+
+</tr>
+<tr>
+<td> 0 <td>
+<td> 3 <td>
+<td> 9  <td>
+<td> 19 <td>
+<td> 34  <td>
+<td> 55  <td>
+
+</tr>
+<tr>
+<td> 0 <td>
+<td> 4 <td>
+<td> 14 <td>
+<td> 34 <td>
+<td> 69  <td>
+<td> 125 <td>
+
+</tr>
+<tr>
+<td> 0 <td>
+<td> 5 <td>
+<td> 20 <td>
+<td> 55 <td>
+<td> 125 <td>
+<td> 251 <td>
+
+
+</tr>
+<tr>
+</tr>
+</table>
+<p>Here is a code of makefile:</p>
+<pre><code>
+
+output: lex.yy.c yacc.tab.c
+	gcc -o output lex.yy.c yacc.tab.c
+
+lex.yy.c: lexer.l
+	flex lexer.l
+
+yacc.tab.c: yacc.y
+	bison -d yacc.y
+
+clean:
+	rm lex.yy.c yacc.tab.c output yacc.tab.h
+
+</code></pre>
+<p></p>
+
+<p>Code of shell file:</p>
+
+<pre><code>
+
+make
+./output  < $1 $2
+exist=`which firefox`
+if [ ! -z "$exist" ]
+then firefox $2
+fi
+make clean
+
+</code></pre>
+</body>
+</html>
