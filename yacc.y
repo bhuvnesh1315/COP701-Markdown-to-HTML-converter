@@ -155,7 +155,7 @@ sentence: %empty
       | CLOSE_ANG {write(">");} sentence
 ;
 
-table:    {write("<tr>\n");} tab_head {write("</tr>\n");} linebreak separate  linebreak {write("<tr>\n");} tab_data {write("</tr>\n");}
+table:    {write("<tr>\n");} tab_head {write("</tr>\n");} linebreak separate  linebreak {write("<tr>\n");} tab_data {fseek(out,-5,SEEK_CUR);}
 ;
 
 tab_head:   PIPE
